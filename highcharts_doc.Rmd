@@ -1,0 +1,139 @@
+---
+title: "highcharts - doc"
+author: "Deniz"
+date: "2022-11-24"
+output: html_document
+---
+
+highcharts - shiny
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(highcharter)
+library(gapminder)
+library(dplyr)
+```
+
+```{r}
+column.graph <- gapminder |>
+  filter(continent == "Asia" & year == 2007)
+hchart(column.graph, type = "column",
+        hcaes(x = country,
+              y = gdpPercap)) |>
+  hc_title(text  = "gdpPercap in Asia countries",
+           align = "center",
+           fontWeight = "bold") |> 
+  hc_subtitle(text = "Year: 2007",
+              align = "left")
+  
+```
+
+
+#gapminder.turkey
+```{r}
+gapminder.turkey <- gapminder |>
+  filter(country == "Turkey")
+hchart(gapminder.turkey, 
+         type = "line", 
+         hcaes(x = year, 
+               y = lifeExp))
+  
+```
+
+#gapminder.usa
+```{r}
+gapminder.unitedstates <-gapminder |>
+  filter(country == "United States")
+hchart(gapminder.unitedstates, 
+         type = "scatter", 
+         hcaes(x = year, 
+               y = gdpPercap))
+```
+
+
+#2007 gdpPercap in Europe by country
+```{r}
+gapminder.2007 <- gapminder |>
+  filter(year == 2007 & continent == "Europe")
+hchart(gapminder.2007, 
+         type = "bar", 
+         hcaes(x = country, 
+               y = gdpPercap))  
+```
+
+#hc turkey, usa
+```{r}
+highchart(type = "chart") |>
+  hc_add_series(
+      select(gapminder.turkey, c(year, lifeExp)),
+          type = "line", name = "Turkey", color = "lightblue", hcaes(x = year,
+                                                                     y = lifeExp)) |>
+  
+  hc_add_series(
+      select(gapminder.unitedstates, c(year, lifeExp)),
+          type = "line", name = "USA", color = "red", hcaes(x = year,
+                                                            y = lifeExp))
+    
+```
+
+#City temp
+```{r}
+highchart(type = "chart") |>
+  hc_xAxis(categories = citytemp$month) |>
+  hc_add_series(
+    data = citytemp$tokyo,
+    type = "line", 
+    name = "Tokyo",
+    color= "red",
+    opacity = 0.5) |>
+  hc_add_series(
+    data = citytemp$london,
+    type = "line",
+    name = "London",
+    color= "darkblue",
+    opacity = 0.5
+    ) |>
+  hc_add_series(
+    data = citytemp$berlin,
+    type = "line",
+    name = "Berlin",
+    color = "black",
+    opacity = 0.5
+    )|>
+  hc_title(text = "City temperature of some cities",
+           margin = 20,
+           align = "left",
+           style = list(color = "black",  fontWeight = "bold"))|>
+  hc_subtitle(text = "Some subtitle",
+              align = "left",
+              style = list(color = "black")) |>
+  hc_exporting(
+    enabled = TRUE,
+    filename = "DenizCityTemp"
+  )
+```
+
+
+
+Yazıların arkasındaki gölge kaldırılabilir.
+#Tree map of continen asia in 1982
+```{r}
+gapminder |>
+  filter(continent == "Asia" & year == 1982) |>
+  hchart('treemap', hcaes(x = 'country', 
+                          value = 'gdpPercap',
+                          color = 'gdpPercap')) |>
+  hc_title(text = "Tree map of continen asia in 1982",
+           margin = 20,
+           align = "left",
+           style = list(color = "black",  fontWeight = "bold"))
+  
+```
+
