@@ -1,0 +1,106 @@
+---
+title: "indiagdp"
+author: "Deniz"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(ggcorrplot)
+```
+
+#Importing and filtering the data set
+
+```{r}
+df <- read.csv("C:/Users/DenizD/Desktop/Visbanking Çalışma/indiaGDP/India_GDP_1960-2022.csv", header = TRUE) #import
+df <- df[ -c(1) ] #delete the first column 
+names(df) <- lapply(df[1, ], as.character) # deal the wrong column names
+df <- df[-1,] #delete the first row 
+df$`GDP in (Billion) $` <- as.numeric(df$`GDP in (Billion) $`) #chr into num
+df$`Per Capita in rupees` <- as.numeric(df$`Per Capita in rupees`) #chr into num
+df$`Growth %` <- as.numeric(df$`Growth %`) #chr into num
+df$Year <- as.numeric(df$Year) #chr into num
+df <- df %>% 
+  arrange(Year) #arrange the data ascending by year
+sum(is.na(df)) #checking the na
+```
+
+#Visualization
+
+##Growth % against Year
+```{r}
+ggplot(df) +
+  aes(x = Year, y = `Growth %`) +
+  geom_line(size = 0.69, colour = "steelblue") +
+  labs(
+    y = "Growth %",
+    subtitle = "Growth % against Year"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(size = 10,
+    face = "bold"),
+    axis.title.x = element_blank()
+  )
+```
+
+##GDP against Year
+```{r}
+ggplot(df) +
+  aes(x = Year, y = `GDP in (Billion) $`) +
+  geom_line(size = 0.69, colour = "steelblue") +
+  labs(
+    y = "GDP in (B)$",
+    subtitle = "GDP against Year"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(size = 10,
+                                face = "bold"),
+    axis.title.x = element_blank()
+  )
+```
+
+##Per Capita in rupees against Year 
+```{r}
+ggplot(df) +
+  aes(x = Year, y = `Per Capita in rupees`) +
+  geom_line(size = 0.7, colour = "steelblue") +
+  labs(
+    y = "Per Capita in rupees",
+    subtitle = "Per Capita in rupees against Year"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(size = 10,
+    face = "bold"),
+    axis.title.x = element_blank()
+  )
+```
+
+##Correlation plot
+```{r}
+corr <- round(cor(df), 1)
+knitr::kable(corr)
+
+ggcorrplot(corr, hc.order = TRUE, type = "lower",
+   ggtheme = ggplot2::theme_gray,
+   colors = c("#6D9EC1", "white", "#E46726"), lab = TRUE)
+```
+
+#Modelling 
+
+##1. linear modals: both model can be usable
+```{r}
+lm_model <- lm(`GDP in (Billion) $` ~ `Per Capita in rupees`,data = df)
+summary(lm_model)
+
+lm_model2 <- lm(`Per Capita in rupees` ~ `GDP in (Billion) $`, data = df)
+summary(lm_model2)
+```
